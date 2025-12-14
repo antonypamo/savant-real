@@ -1,4 +1,4 @@
-.name: Savant Bench & Gate
+name: Savant Bench & Gate
 
 on:
   push:
