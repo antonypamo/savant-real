@@ -1,0 +1,34 @@
+.name: Savant Bench & Gate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          pip install -r requirements.txt
+
+      - name: Start API
+        run: |
+          uvicorn api.app:app --host 127.0.0.1 --port 8000 &
+          sleep 10
+
+      - name: Run suite (smoke/hardening/benchmark/gate)
+        run: |
+          python bench/run_bench.py --base-url http://127.0.0.1:8000 --out artifacts --n 50 --warmup 8 --discard 5
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: savant_artifacts
+          path: artifacts/
